@@ -24,6 +24,9 @@ public class VHSPostProcessEffect : MonoBehaviour {
     public float BleedGShift = 0f;
     [Range(-.2f, .2f)]
     public float BleedBShift = -0.02f;
+
+    [Range(1,16)]
+    public int renderResolutionDivision = 4;
     
     private Material _material;
     public Material Material {
@@ -40,8 +43,8 @@ public class VHSPostProcessEffect : MonoBehaviour {
     private VideoPlayer _videoPlayer;
     public void Start()
     {
-        
         Screen.clip = Intro;
+        
         
         Screen.isLooping = true;
 
@@ -62,8 +65,6 @@ public class VHSPostProcessEffect : MonoBehaviour {
 
         SetShaderVariables();
 
-        
-
         _yScanline += Time.deltaTime * 0.01f;
         _xScanline -= Time.deltaTime * 0.1f;
 
@@ -78,7 +79,7 @@ public class VHSPostProcessEffect : MonoBehaviour {
         Material.SetFloat("_yScanline", _yScanline);
         Material.SetFloat("_xScanline", _xScanline);
         
-        var renderTexture = RenderTexture.GetTemporary(source.width, source.height, 1, renderTextureFormat);
+        var renderTexture = RenderTexture.GetTemporary(source.width/renderResolutionDivision, source.height/renderResolutionDivision, 1, renderTextureFormat);
         Graphics.Blit(source, renderTexture);
         
         Graphics.Blit(renderTexture, destination, Material);

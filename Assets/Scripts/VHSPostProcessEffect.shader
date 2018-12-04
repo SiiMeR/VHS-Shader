@@ -27,11 +27,19 @@
 			
 			float _yScanline;
 			float _xScanline;
-			float rand(float3 co){
-			     return frac(sin( dot(co.xyz ,float3(12.9898,78.233,45.5432) )) * 43758.5453);
-			}
  
-			fixed4 frag (v2f_img i) : COLOR{
+            min16float rand(float2 co)
+            {
+                min16float a = 12.9898;
+                min16float b = 78.233;
+                min16float c = 43758.5453;
+                min16float dt= dot(co.xy ,float2(a,b));
+                min16float sn= fmod(dt,3.14);
+                return frac(sin(sn) * c);
+            }
+            
+			fixed4 frag (v2f_img i) : COLOR
+			{
 
 				fixed4 vhs = tex2D (_VHSTex, i.uv);
 				
@@ -54,10 +62,11 @@
 				
 				fixed4 c = tex2D (_MainTex, i.uv);
 				
-				float bleedR = tex2D(_MainTex, i.uv + float2(_bleedShiftR, 0)).r;
+				
 				float bleedG = tex2D(_MainTex, i.uv + float2(_bleedShiftG, 0)).g;
-				float bleedB = tex2D(_MainTex, i.uv + float2(_bleedShiftB, -0.01)).b;
-
+                float bleedR = tex2D(_MainTex, i.uv + float2(_bleedShiftR + 0.01*rand(frac(_SinTime.y)), 0)).r;
+                float bleedB = tex2D(_MainTex, i.uv + float2(_bleedShiftB, -0.01)).b;
+                
 			    float3 bleed = float3(bleedR, bleedG, bleedB);
                 bleed *= _bleedIntensity;
 				
