@@ -1768,9 +1768,10 @@ MonoBehaviour:
   Screen: {fileID: 1625304836}
   renderTextureFormat: 4
   BleedIntensity: -0.4
-  BleedRShift: 0.015
+  BleedRShift: 0.01
   BleedGShift: 0
-  BleedBShift: -0.002
+  BleedBShift: -0.001
+  renderResolutionDivision: 4
 --- !u!1 &1268567651
 GameObject:
   m_ObjectHideFlags: 0

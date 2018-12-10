@@ -1,18 +1,15 @@
-﻿using System;
-using UnityEngine;
-using System.Collections;
-using System.Linq;
+﻿using UnityEngine;
 using UnityEngine.Video;
-using Random = UnityEngine.Random;
 
 //[ExecuteInEditMode]
 [RequireComponent (typeof(Camera))]
 public class VHSPostProcessEffect : MonoBehaviour {
     
     public Shader shader;
-    public VideoClip VHS;
-    public VideoClip Intro;
-    public VideoPlayer Screen;
+    public Shader crtShader;
+    public VideoClip vhs;
+    public VideoClip intro;
+    public VideoPlayer screen;
     public RenderTextureFormat renderTextureFormat = RenderTextureFormat.Default;
     
     
@@ -27,13 +24,23 @@ public class VHSPostProcessEffect : MonoBehaviour {
 
     [Range(1,16)]
     public int renderResolutionDivision = 4;
-    
+
     private Material _material;
+    private Material _crtMaterial;
+    public Material CrtMaterial
+    {        
+        get {
+            if (_crtMaterial == null) {
+                _crtMaterial = new Material(crtShader) {hideFlags = HideFlags.HideAndDontSave};
+            }
+            return _crtMaterial;
+        } 
+    }
+
     public Material Material {
         get {
             if (_material == null) {
-                _material = new Material(shader);
-                _material.hideFlags = HideFlags.HideAndDontSave;
+                _material = new Material(shader) {hideFlags = HideFlags.HideAndDontSave};
             }
             return _material;
         } 
@@ -43,14 +50,14 @@ public class VHSPostProcessEffect : MonoBehaviour {
     private VideoPlayer _videoPlayer;
     public void Start()
     {
-        Screen.clip = Intro;
+        screen.clip = intro;
         
         
-        Screen.isLooping = true;
+        screen.isLooping = true;
 
-        Screen.sendFrameReadyEvents = true;
+        screen.sendFrameReadyEvents = true;
 
-        Screen.Play();
+        screen.Play();
 
    
 //        VHS.isLooping = true;
@@ -80,9 +87,10 @@ public class VHSPostProcessEffect : MonoBehaviour {
         Material.SetFloat("_xScanline", _xScanline);
         
         var renderTexture = RenderTexture.GetTemporary(source.width/renderResolutionDivision, source.height/renderResolutionDivision, 1, renderTextureFormat);
-        Graphics.Blit(source, renderTexture);
+        // Graphics
+        Graphics.Blit(source, destination, CrtMaterial);
         
-        Graphics.Blit(renderTexture, destination, Material);
+//        Graphics.Blit(renderTexture, destination, Material);
         
         RenderTexture.ReleaseTemporary(renderTexture);
     }
